@@ -6,9 +6,9 @@ from math import floor
 
 def split_iati(target_mb, filename, out_dir=None):
     # Parse XML
-
     if out_dir is None:
         out_dir = os.path.dirname(filename)
+    print("Output will be saved in {}.".format(out_dir))
     filename_base = os.path.splitext(os.path.basename(filename))[0]
     tree = etree.parse(filename)
     root = tree.getroot()
@@ -33,13 +33,18 @@ def split_iati(target_mb, filename, out_dir=None):
         if i % max_activities == max_activities - 1 or i == len(root_activities) - 1:  # Write once for every max_activities or once we reach the end
             doc = etree.ElementTree(base_copy)
             file_counter = floor(i / max_activities)
-            with open("{}{}{}-{}.xml".format(out_dir, os.path.sep, filename_base, file_counter), "wb") as xmlfile:
+            out_filename = "{}-{}.xml".format(filename_base, file_counter)
+            print("Writing {}...".format(out_filename))
+            with open(os.path.join(out_dir, out_filename), "wb") as xmlfile:
                 doc.write(xmlfile, encoding="utf-8", pretty_print=True)
             base_copy = deepcopy(base)
 
+    print("Done.")
+
 
 if __name__ == "__main__":
-    target_mb = 1
-    filename = "/home/alex/git/iati-splitter/Japan/Japan-Technical-Cooperation-Activities.xml"
-    out_dir = "/home/alex/git/iati-splitter/Japan/Japan-split"
-    split_iati(target_mb, filename, out_dir)
+    split_iati(
+        1,
+        "/home/alex/git/iati-splitter/Japan/Japan-Technical-Cooperation-Activities.xml",
+        "/home/alex/git/iati-splitter/Japan/Japan-split"
+    )
